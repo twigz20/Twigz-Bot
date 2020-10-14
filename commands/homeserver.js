@@ -23,7 +23,7 @@ module.exports = {
                 console.error(err);
             });
 
-        var qbtScheduler1 = schedule.scheduleJob('0 * * * *', async function () {
+        var qbtScheduler1 = schedule.scheduleJob('0 0 * * *', async function () {
             if (!qbt) {
                 try {
                     qbt = await qbittorrent.connect(process.env.QBT_HOST, process.env.QBT_USERNAME, process.env.QBT_PASSWORD);
