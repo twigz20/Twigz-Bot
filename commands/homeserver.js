@@ -1,3 +1,4 @@
+const { Message } = require('discord.js');
 const qbittorrent = require('qbittorrent-api-v2');
 const schedule = require('node-schedule');
 
@@ -24,65 +25,25 @@ module.exports = {
             });
 
         var qbtScheduler1 = schedule.scheduleJob('0 0 * * *', async function () {
-            if (!qbt) {
-                try {
-                    qbt = await qbittorrent.connect(process.env.QBT_HOST, process.env.QBT_USERNAME, process.env.QBT_PASSWORD);
-                } catch (err) {
-                    console.error('Failed to connect to QBittorrent. Check Host, Username and Password.');
-                    console.error(err);
-                }
+            var guild = _client.guilds.cache.get(process.env.GUILD_ID);
+            if (guild) {
+                let data = { content: "!twi homeserver qbittorrent resume" };
+                let homeserver_channel = guild.channels.cache.get(process.env.HOMESERVER_CHANNEL_ID);
+                let message = new Message(_client, data, homeserver_channel);
+                message.author = guild.members.cache.get(process.env.GUILD_USER_ID);
+                _client.emit('message', message);
             }
-            qbt.torrents('paused')
-                .then(torrents => {
-                    let pausedTorrents = torrents
-                        .map(function (value) {
-                            return value.hash;
-                        })
-                        .join('|');
-                    qbt.resumeTorrents(pausedTorrents)
-                        .then(function () {
-                            const channel = _client.channels.cache.find(channel => channel.id === '765750393291538462')
-                            channel.send(`All applicable torrents resumed.`)
-                            console.log("All applicable torrents resumed.");
-                        })
-                        .catch(err => {
-                            console.error(err)
-                        })
-                })
-                .catch(err => {
-                    console.error(err)
-                })
         });
 
         var qbtScheduler2 = schedule.scheduleJob('0 9 * * *', async function () {
-            if (!qbt) {
-                try {
-                    qbt = await qbittorrent.connect(process.env.QBT_HOST, process.env.QBT_USERNAME, process.env.QBT_PASSWORD);
-                } catch (err) {
-                    console.error('Failed to connect to QBittorrent. Check Host, Username and Password.');
-                    console.error(err);
-                }
+            var guild = _client.guilds.cache.get(process.env.GUILD_ID);
+            if (guild) {
+                let data = { content: "!twi homeserver qbittorrent pause" };
+                let homeserver_channel = guild.channels.cache.get(process.env.HOMESERVER_CHANNEL_ID);
+                let message = new Message(_client, data, homeserver_channel);
+                message.author = guild.members.cache.get(process.env.GUILD_USER_ID);
+                _client.emit('message', message);
             }
-            qbt.torrents('resumed')
-                .then(torrents => {
-                    let resumedTorrents = torrents
-                        .map(function (value) {
-                            return value.hash;
-                        })
-                        .join('|');
-                    qbt.pauseTorrents(resumedTorrents)
-                        .then(function () {
-                            const channel = _client.channels.cache.find(channel => channel.id === '765750393291538462')
-                            channel.send(`All applicable torrents paused.`)
-                            console.log("All applicable torrents paused.");
-                        })
-                        .catch(err => {
-                            console.error(err)
-                        })
-                })
-                .catch(err => {
-                    console.error(err)
-                })
         });
     },
     async execute(message, args) {
@@ -100,6 +61,7 @@ module.exports = {
                     } catch (err) {
                         console.error('Failed to connect to QBittorrent. Check Host, Username and Password.');
                         console.error(err);
+                        return message.reply('Failed to connect to QBittorrent. Check Host, Username and Password.').then(msg => msg.delete(5000));
                     }
                 }
 

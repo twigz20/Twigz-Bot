@@ -1,4 +1,3 @@
-const version = process.env.VERSION;
 module.exports = {
     name: 'version',
     description: 'Version',
@@ -12,6 +11,6 @@ module.exports = {
 
     },
     execute(message, args) {
-        message.channel.send(version);
+        message.channel.send(process.env.VERSION);
     },
 };
